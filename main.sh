@@ -6,16 +6,15 @@
 #
 #!/bin/bash
 
-DIR="/datasets01/imagenet_full_size/061417/train"
+DIR="celeba_dataset/"
 ARCH="alexnet"
 LR=0.05
 WD=-5
 K=10000
 WORKERS=12
-EXP="/private/home/${USER}/test/exp"
-PYTHON="/private/home/${USER}/test/conda/bin/python"
+EXP="trained_models/"
 
 mkdir -p ${EXP}
 
-CUDA_VISIBLE_DEVICES=0 ${PYTHON} main.py ${DIR} --exp ${EXP} --arch ${ARCH} \
+python main.py ${DIR} --exp ${EXP} --arch ${ARCH} \
   --lr ${LR} --wd ${WD} --k ${K} --sobel --verbose --workers ${WORKERS}

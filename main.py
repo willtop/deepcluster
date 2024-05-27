@@ -20,6 +20,7 @@ import torch.optim
 import torch.utils.data
 import torchvision.transforms as transforms
 import torchvision.datasets as datasets
+from torchvision.datasets.celeba import CelebA
 
 import clustering
 import models
@@ -119,21 +120,24 @@ def main(args):
     # preprocessing of data
     normalize = transforms.Normalize(mean=[0.485, 0.456, 0.406],
                                      std=[0.229, 0.224, 0.225])
-    tra = [transforms.Resize(256),
+    data_transforms = transforms.Compose([
+           transforms.Resize(256),
            transforms.CenterCrop(224),
            transforms.ToTensor(),
-           normalize]
+           normalize])
 
-    # load the data
-    end = time.time()
-    dataset = datasets.ImageFolder(args.data, transform=transforms.Compose(tra))
-    if args.verbose:
-        print('Load dataset: {0:.2f} s'.format(time.time() - end))
+    print("Use torchvision to load the CelebA data...")
+    celeba_train = CelebA(args.data, 
+                          split="train",
+                          target_type="identity",
+                          transform=data_transforms,
+                          download=True)
 
-    dataloader = torch.utils.data.DataLoader(dataset,
+    dataloader = torch.utils.data.DataLoader(celeba_train,
                                              batch_size=args.batch,
                                              num_workers=args.workers,
                                              pin_memory=True)
+    print("CelebA preparation completed!")
 
     # clustering algorithm to use
     deepcluster = clustering.__dict__[args.clustering](args.nmb_cluster)
@@ -259,7 +263,7 @@ def train(loader, model, crit, opt, epoch):
                 'optimizer' : opt.state_dict()
             }, path)
 
-        target = target.cuda(async=True)
+        target = target.cuda(non_blocking=True)
         input_var = torch.autograd.Variable(input_tensor.cuda())
         target_var = torch.autograd.Variable(target)
 
