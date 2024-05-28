@@ -6,13 +6,13 @@
 #
 #!/bin/bash
 
-DIR="celeba_dataset/"
+DIR="/home/${USER}/deepcluster/celeba_dataset/"
 ARCH="alexnet"
 LR=0.05
 WD=-5
 K=10000
 WORKERS=12
-EXP="trained_models/"
+EXP="/home/${USER}/deepcluster/trained_models/"
 
 mkdir -p ${EXP}
 

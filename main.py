@@ -151,7 +151,7 @@ def main(args):
         model.classifier = nn.Sequential(*list(model.classifier.children())[:-1])
 
         # get the features for the whole dataset
-        features = compute_features(dataloader, model, len(dataset))
+        features = compute_features(dataloader, model, len(celeba_train))
 
         # cluster the features
         if args.verbose:
@@ -162,7 +162,7 @@ def main(args):
         if args.verbose:
             print('Assign pseudo labels')
         train_dataset = clustering.cluster_assign(deepcluster.images_lists,
-                                                  dataset.imgs)
+                                                  celeba_train)
 
         # uniformly sample per target
         sampler = UnifLabelSampler(int(args.reassign * len(train_dataset)),
@@ -302,8 +302,8 @@ def compute_features(dataloader, model, N):
     model.eval()
     # discard the label information in the dataloader
     for i, (input_tensor, _) in enumerate(dataloader):
-        input_var = torch.autograd.Variable(input_tensor.cuda(), volatile=True)
-        aux = model(input_var).data.cpu().numpy()
+        with torch.no_grad():
+            aux = model(input_tensor.cuda()).data.cpu().numpy()
 
         if i == 0:
             features = np.zeros((N, aux.shape[1]), dtype='float32')
