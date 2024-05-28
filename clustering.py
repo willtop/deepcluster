@@ -49,12 +49,12 @@ class ReassignedDataset(data.Dataset):
 
     def make_dataset(self, image_indexes, pseudolabels, dataset):
         label_to_idx = {label: idx for idx, label in enumerate(set(pseudolabels))}
-        images = []
+        path_label_pairs = []
         for j, idx in enumerate(image_indexes):
             path = dataset[idx][0]
             pseudolabel = label_to_idx[pseudolabels[j]]
-            images.append((path, pseudolabel))
-        return images
+            path_label_pairs.append((path, pseudolabel))
+        return path_label_pairs
 
     def __getitem__(self, index):
         """
@@ -176,7 +176,10 @@ def run_kmeans(x, nmb_clusters, verbose=False):
     # perform the training
     clus.train(x, index)
     _, I = index.search(x, 1)
-    losses = faiss.vector_to_array(clus.obj)
+
+    # for newer version of faiss, getting obj explicitly 
+    stats = clus.iteration_stats
+    losses = np.array([stats.at(i).obj for i in range(stats.size())])
     if verbose:
         print('k-means loss evolution: {0}'.format(losses))
 

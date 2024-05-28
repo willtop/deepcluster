@@ -5,3 +5,4 @@
 .ipynb_checkpoints
 third-parties/
 third-parties/*
+celeba_dataset/

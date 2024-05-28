@@ -6,7 +6,7 @@
 #
 #!/bin/bash
 
-DIR="/home/${USER}/deepcluster/celeba_dataset/"
+DIR="/home/${USER}/deepcluster/celeba_dataset/celeba/img_align_celeba/train"
 ARCH="alexnet"
 LR=0.05
 WD=-5

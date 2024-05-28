@@ -20,7 +20,6 @@ import torch.optim
 import torch.utils.data
 import torchvision.transforms as transforms
 import torchvision.datasets as datasets
-from torchvision.datasets.celeba import CelebA
 
 import clustering
 import models
@@ -126,14 +125,12 @@ def main(args):
            transforms.ToTensor(),
            normalize])
 
-    print("Use torchvision to load the CelebA data...")
-    celeba_train = CelebA(args.data, 
-                          split="train",
-                          target_type="identity",
-                          transform=data_transforms,
-                          download=True)
-
-    dataloader = torch.utils.data.DataLoader(celeba_train,
+    # if the CelebA dataset has not been downloaded
+    # run prepare_celebA.py
+    celeba_dataset = datasets.ImageFolder(args.data, 
+                                          transform=data_transforms)
+    
+    dataloader = torch.utils.data.DataLoader(celeba_dataset,
                                              batch_size=args.batch,
                                              num_workers=args.workers,
                                              pin_memory=True)
@@ -151,7 +148,7 @@ def main(args):
         model.classifier = nn.Sequential(*list(model.classifier.children())[:-1])
 
         # get the features for the whole dataset
-        features = compute_features(dataloader, model, len(celeba_train))
+        features = compute_features(dataloader, model, len(celeba_dataset))
 
         # cluster the features
         if args.verbose:
@@ -162,7 +159,7 @@ def main(args):
         if args.verbose:
             print('Assign pseudo labels')
         train_dataset = clustering.cluster_assign(deepcluster.images_lists,
-                                                  celeba_train)
+                                                  celeba_dataset.imgs)
 
         # uniformly sample per target
         sampler = UnifLabelSampler(int(args.reassign * len(train_dataset)),
@@ -271,7 +268,7 @@ def train(loader, model, crit, opt, epoch):
         loss = crit(output, target_var)
 
         # record loss
-        losses.update(loss.data[0], input_tensor.size(0))
+        losses.update(loss.item(), input_tensor.size(0))
 
         # compute gradient and do SGD step
         opt.zero_grad()
