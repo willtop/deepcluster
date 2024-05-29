@@ -13,8 +13,9 @@ WD=-5
 K=10000
 WORKERS=12
 EXP="/home/${USER}/deepcluster/trained_models/"
+RESUME="/home/${USER}/deepcluster/trained_models/checkpoint.pth.tar"
 
 mkdir -p ${EXP}
 
-python main.py ${DIR} --exp ${EXP} --arch ${ARCH} \
+python main.py ${DIR} --exp ${EXP} --arch ${ARCH} --resume ${RESUME} \
   --lr ${LR} --wd ${WD} --k ${K} --sobel --verbose --workers ${WORKERS}

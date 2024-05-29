@@ -20,6 +20,7 @@ import torch.optim
 import torch.utils.data
 import torchvision.transforms as transforms
 import torchvision.datasets as datasets
+from tqdm import tqdm
 
 import clustering
 import models
@@ -98,7 +99,7 @@ def main(args):
             checkpoint = torch.load(args.resume)
             args.start_epoch = checkpoint['epoch']
             # remove top_layer parameters from checkpoint
-            for key in checkpoint['state_dict']:
+            for key in list(checkpoint['state_dict'].keys()):
                 if 'top_layer' in key:
                     del checkpoint['state_dict'][key]
             model.load_state_dict(checkpoint['state_dict'])
@@ -140,7 +141,7 @@ def main(args):
     deepcluster = clustering.__dict__[args.clustering](args.nmb_cluster)
 
     # training convnet with DeepCluster
-    for epoch in range(args.start_epoch, args.epochs):
+    for epoch in tqdm(range(args.start_epoch, args.epochs), desc="outer iteration"):
         end = time.time()
 
         # remove head
