@@ -20,17 +20,19 @@ import torch.optim
 import torch.utils.data
 import torchvision.transforms as transforms
 import torchvision.datasets as datasets
+import datetime
 from tqdm import tqdm
 
 import clustering
 import models
-from util import AverageMeter, Logger, UnifLabelSampler
+from util import AverageMeter, Logger, UnifLabelSampler, MPI3D
 
 
 def parse_args():
     parser = argparse.ArgumentParser(description='PyTorch Implementation of DeepCluster')
 
-    parser.add_argument('data', metavar='DIR', help='path to dataset')
+    parser.add_argument("--dataset", choices=['celeba', 'mpi3d'])
+    parser.add_argument('--datadir', metavar='DIR', help='path to dataset')
     parser.add_argument('--arch', '-a', type=str, metavar='ARCH',
                         choices=['alexnet', 'vgg16'], default='alexnet',
                         help='CNN architecture (default: alexnet)')
@@ -110,32 +112,56 @@ def main(args):
             print("=> no checkpoint found at '{}'".format(args.resume))
 
     # creating checkpoint repo
-    exp_check = os.path.join(args.exp, 'checkpoints')
+    exp_check = os.path.join(args.exp, f'{args.dataset}_checkpoints')
     if not os.path.isdir(exp_check):
         os.makedirs(exp_check)
 
     # creating cluster assignments log
-    cluster_log = Logger(os.path.join(args.exp, 'clusters'))
+    cluster_log = Logger(os.path.join(args.exp, f'{args.dataset}_clusters'))
 
     # preprocessing of data
-    normalize = transforms.Normalize(mean=[0.485, 0.456, 0.406],
-                                     std=[0.229, 0.224, 0.225])
-    data_transforms = transforms.Compose([
-           transforms.Resize(256),
-           transforms.CenterCrop(224),
-           transforms.ToTensor(),
-           normalize])
+    if args.dataset == "celeba":
+        normalize = transforms.Normalize(mean=[0.485, 0.456, 0.406],
+                                        std=[0.229, 0.224, 0.225])
+        data_transforms = transforms.Compose([
+            transforms.Resize(256),
+            transforms.CenterCrop(224),
+            transforms.ToTensor(),
+            normalize])
+        # if the CelebA has not been downloaded
+        # run prepare_celebA.py
+        prepared_dataset = datasets.ImageFolder(args.datadir, 
+                                                transform=data_transforms)
+    elif args.dataset == "mpi3d":
+        data_transforms = transforms.Compose([
+            transforms.Resize((224, 224)),
+            transforms.ToTensor()])
+        # load the MPI3D dataset from the downloaded npz file
+        datafile_path = os.path.join(os.path.dirname(os.path.abspath(__file__)),
+                                     "mpi3d_dataset", 
+                                     "real3d_complicated_shapes_ordered.npz")
+        print(f"Loading mpi3d data from {datafile_path}...")
+        start_time = datetime.datetime.now().replace(microsecond=0)
+        mpi3d_data = np.load(datafile_path)['images']
+        n_imgs = mpi3d_data.shape[0]
+        assert n_imgs == 460800
+        end_time = datetime.datetime.now().replace(microsecond=0)
+        print(f"[MPI3D] data loaded, took time: {end_time-start_time}.")
+        # wrap it around a torch dataset object for dataloader
+        # the dataset object has imgs field to match that constructed by the torchvision ImageFolder
+        prepared_dataset = MPI3D(mpi3d_data, data_transforms)
 
-    # if the CelebA dataset has not been downloaded
-    # run prepare_celebA.py
-    celeba_dataset = datasets.ImageFolder(args.data, 
-                                          transform=data_transforms)
+    else:
+        print("Unimplemented dataset: ", args.dataset)
+        exit(1)
+
     
-    dataloader = torch.utils.data.DataLoader(celeba_dataset,
+    
+    dataloader = torch.utils.data.DataLoader(prepared_dataset,
                                              batch_size=args.batch,
                                              num_workers=args.workers,
                                              pin_memory=True)
-    print("CelebA preparation completed!")
+    print(f"{args.dataset} preparation completed!")
 
     # clustering algorithm to use
     deepcluster = clustering.__dict__[args.clustering](args.nmb_cluster)
@@ -149,7 +175,7 @@ def main(args):
         model.classifier = nn.Sequential(*list(model.classifier.children())[:-1])
 
         # get the features for the whole dataset
-        features = compute_features(dataloader, model, len(celeba_dataset))
+        features = compute_features(dataloader, model, len(prepared_dataset))
 
         # cluster the features
         if args.verbose:
@@ -160,7 +186,7 @@ def main(args):
         if args.verbose:
             print('Assign pseudo labels')
         train_dataset = clustering.cluster_assign(deepcluster.images_lists,
-                                                  celeba_dataset.imgs)
+                                                  prepared_dataset.imgs)
 
         # uniformly sample per target
         sampler = UnifLabelSampler(int(args.reassign * len(train_dataset)),
@@ -208,7 +234,7 @@ def main(args):
                     'arch': args.arch,
                     'state_dict': model.state_dict(),
                     'optimizer' : optimizer.state_dict()},
-                   os.path.join(args.exp, 'checkpoint.pth.tar'))
+                   os.path.join(args.exp, f'{args.dataset}_checkpoint.pth.tar'))
 
         # save cluster assignments
         cluster_log.log(deepcluster.images_lists)
@@ -249,7 +275,7 @@ def train(loader, model, crit, opt, epoch):
         if n % args.checkpoints == 0:
             path = os.path.join(
                 args.exp,
-                'checkpoints',
+                f'{args.dataset}_checkpoints',
                 'checkpoint_' + str(n / args.checkpoints) + '.pth.tar',
             )
             if args.verbose:

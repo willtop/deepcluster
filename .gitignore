@@ -6,3 +6,5 @@
 third-parties/
 third-parties/*
 celeba_dataset/
+mpi3d_dataset/
+trained_models/
