@@ -134,8 +134,8 @@ def main(args):
                                                 transform=data_transforms)
     elif args.dataset == "mpi3d":
         data_transforms = transforms.Compose([
-            transforms.Resize((224, 224)),
-            transforms.ToTensor()])
+            transforms.ToTensor(),
+            transforms.Resize((224, 224))])
         # load the MPI3D dataset from the downloaded npz file
         datafile_path = os.path.join(os.path.dirname(os.path.abspath(__file__)),
                                      "mpi3d_dataset", 
@@ -150,7 +150,6 @@ def main(args):
         # wrap it around a torch dataset object for dataloader
         # the dataset object has imgs field to match that constructed by the torchvision ImageFolder
         prepared_dataset = MPI3D(mpi3d_data, data_transforms)
-
     else:
         print("Unimplemented dataset: ", args.dataset)
         exit(1)
