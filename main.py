@@ -20,12 +20,11 @@ import torch.optim
 import torch.utils.data
 import torchvision.transforms as transforms
 import torchvision.datasets as datasets
-import datetime
 from tqdm import tqdm
 
 import clustering
 import models
-from util import AverageMeter, Logger, UnifLabelSampler, MPI3D
+from util import AverageMeter, Logger, UnifLabelSampler
 
 
 def parse_args():
@@ -128,33 +127,18 @@ def main(args):
             transforms.CenterCrop(224),
             transforms.ToTensor(),
             normalize])
-        # if the CelebA has not been downloaded
-        # run prepare_celebA.py
-        prepared_dataset = datasets.ImageFolder(args.datadir, 
-                                                transform=data_transforms)
     elif args.dataset == "mpi3d":
         data_transforms = transforms.Compose([
             transforms.ToTensor(),
             transforms.Resize((224, 224))])
-        # load the MPI3D dataset from the downloaded npz file
-        datafile_path = os.path.join(os.path.dirname(os.path.abspath(__file__)),
-                                     "mpi3d_dataset", 
-                                     "real3d_complicated_shapes_ordered.npz")
-        print(f"Loading mpi3d data from {datafile_path}...")
-        start_time = datetime.datetime.now().replace(microsecond=0)
-        mpi3d_data = np.load(datafile_path)['images']
-        n_imgs = mpi3d_data.shape[0]
-        assert n_imgs == 460800
-        end_time = datetime.datetime.now().replace(microsecond=0)
-        print(f"[MPI3D] data loaded, took time: {end_time-start_time}.")
-        # wrap it around a torch dataset object for dataloader
-        # the dataset object has imgs field to match that constructed by the torchvision ImageFolder
-        prepared_dataset = MPI3D(mpi3d_data, data_transforms)
     else:
         print("Unimplemented dataset: ", args.dataset)
         exit(1)
 
-    
+    # run prepare_celebA.py beforehand for CelebA
+    # run prepare_mpi3d.py beforehand for MPI3D
+    prepared_dataset = datasets.ImageFolder(args.datadir, 
+                                            transform=data_transforms)
     
     dataloader = torch.utils.data.DataLoader(prepared_dataset,
                                              batch_size=args.batch,

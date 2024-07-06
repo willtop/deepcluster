@@ -131,15 +131,3 @@ class Logger(object):
         self.data.append(train_point)
         with open(os.path.join(self.path), 'wb') as fp:
             pickle.dump(self.data, fp, -1)
-
-class MPI3D(Dataset):
-    def __init__(self, imgs, transforms):
-        self.imgs = imgs
-        self.transforms = transforms
-
-    def __len__(self):
-        return np.shape(self.imgs)[0]
-
-    def __getitem__(self, index):
-        # Return 0 as a placeholder for the target
-        return (self.transforms(self.imgs[index]), 0)
