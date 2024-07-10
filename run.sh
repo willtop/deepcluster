@@ -31,4 +31,4 @@ RESUME="/home/${USER}/deepcluster/trained_models/mpi3d_checkpoint.pth.tar"
 mkdir -p ${EXP}
 
 python main.py --dataset ${DATASET} --datadir ${DIR} --exp ${EXP} --arch ${ARCH} --resume ${RESUME} \
-  --lr ${LR} --wd ${WD} --k ${K} --sobel --verbose --workers ${WORKERS}
+  --lr ${LR} --wd ${WD} --k ${K} --verbose --workers ${WORKERS}
