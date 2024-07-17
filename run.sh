@@ -7,26 +7,26 @@
 #!/bin/bash
 
 # CelebA
-# DATASET="celeba"
-# DIR="/home/${USER}/deepcluster/celeba_dataset/celeba/img_align_celeba/train"
-# ARCH="alexnet"
-# LR=0.05
-# WD=-5
-# K=10000
-# WORKERS=12
-# EXP="/home/${USER}/deepcluster/trained_models/"
-# RESUME="/home/${USER}/deepcluster/trained_models/celeba_checkpoint.pth.tar"
-
-# MPI3D
-DATASET="mpi3d"
-DIR="/home/${USER}/deepcluster/mpi3d_dataset/"
+DATASET="celeba"
+DIR="/home/${USER}/deepcluster/celeba_dataset/celeba/img_align_celeba/train"
 ARCH="alexnet"
-LR=0.05
+LR=0.005
 WD=-5
-K=10000
+K=1000
 WORKERS=12
 EXP="/home/${USER}/deepcluster/trained_models/"
-RESUME="/home/${USER}/deepcluster/trained_models/mpi3d_checkpoint.pth.tar"
+RESUME="/home/${USER}/deepcluster/trained_models/celeba_checkpoint.pth.tar"
+
+# MPI3D
+# DATASET="mpi3d"
+# DIR="/home/${USER}/deepcluster/mpi3d_dataset/"
+# ARCH="alexnet"
+# LR=0.005
+# WD=-5
+# K=1000
+# WORKERS=12
+# EXP="/home/${USER}/deepcluster/trained_models/"
+# RESUME="/home/${USER}/deepcluster/trained_models/mpi3d_checkpoint.pth.tar"
 
 mkdir -p ${EXP}
 
