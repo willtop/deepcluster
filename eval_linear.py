@@ -16,7 +16,7 @@ import torch.backends.cudnn as cudnn
 import torch.optim
 import torch.utils.data
 import torchvision.transforms as transforms
-import torchvision.datasets as datasets
+import torchvision.datasets as torchvisiondatasets
 
 from util import AverageMeter, learning_rate_decay, load_model, Logger
 
@@ -91,12 +91,12 @@ def main():
                              transforms.RandomHorizontalFlip(),
                              transforms.ToTensor(),
                              normalize]
-    train_dataset = datasets.ImageFolder(
+    train_dataset = torchvisiondatasets.ImageFolder(
         traindir,
         transform=transforms.Compose(transformations_train)
     )
 
-    val_dataset = datasets.ImageFolder(
+    val_dataset = torchvisiondatasets.ImageFolder(
         valdir,
         transform=transforms.Compose(transformations_val)
     )

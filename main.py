@@ -19,7 +19,7 @@ import torch.backends.cudnn as cudnn
 import torch.optim
 import torch.utils.data
 import torchvision.transforms as transforms
-import torchvision.datasets as datasets
+import torchvision.datasets as torchvisiondatasets
 from tqdm import tqdm
 
 import clustering
@@ -30,7 +30,7 @@ from util import AverageMeter, Logger, UnifLabelSampler
 def parse_args():
     parser = argparse.ArgumentParser(description='PyTorch Implementation of DeepCluster')
 
-    parser.add_argument("--dataset", choices=['celeba', 'mpi3d'])
+    parser.add_argument("--dataset", choices=['celeba', 'mpi3d', 'norb'])
     parser.add_argument('--datadir', metavar='DIR', help='path to dataset')
     parser.add_argument('--arch', '-a', type=str, metavar='ARCH',
                         choices=['alexnet', 'vgg16'], default='alexnet',
@@ -131,13 +131,17 @@ def main(args):
         data_transforms = transforms.Compose([
             transforms.ToTensor(),
             transforms.Resize((224, 224))])
+    elif args.dataset == "norb":
+        data_transforms = transforms.Compose([
+            transforms.ToTensor(),
+            transforms.Resize((224, 224))])
     else:
         print("Unimplemented dataset: ", args.dataset)
         exit(1)
 
     # run prepare_celebA.py beforehand for CelebA
     # run prepare_mpi3d.py beforehand for MPI3D
-    prepared_dataset = datasets.ImageFolder(args.datadir, 
+    prepared_dataset = torchvisiondatasets.ImageFolder(args.datadir, 
                                             transform=data_transforms)
     
     dataloader = torch.utils.data.DataLoader(prepared_dataset,

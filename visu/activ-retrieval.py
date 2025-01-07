@@ -14,7 +14,7 @@ from PIL import Image
 import torch
 import torch.nn as nn
 import torchvision.transforms as transforms
-import torchvision.datasets as datasets
+import torchvision.datasets as torchvisiondatasets
 
 sys.path.insert(0, '..')
 from util import load_model
@@ -54,7 +54,7 @@ def main(args):
            normalize]
 
     # dataset
-    dataset = datasets.ImageFolder(args.data, transform=transforms.Compose(tra))
+    dataset = torchvisiondatasets.ImageFolder(args.data, transform=transforms.Compose(tra))
     dataloader = torch.utils.data.DataLoader(dataset, batch_size=256,
                                              num_workers=args.workers)
 

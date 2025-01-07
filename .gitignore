@@ -5,6 +5,5 @@
 .ipynb_checkpoints
 third-parties/
 third-parties/*
-celeba_dataset/
-mpi3d_dataset/
+datasets/
 trained_models/
