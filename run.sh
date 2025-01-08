@@ -24,7 +24,7 @@ ARCH="alexnet"
 LR=0.005
 WD=-5
 K=1000
-WORKERS=12
+WORKERS=0 # for some reason, with WORKERS being non zero, threading got block when loading batches from dataloader
 EXP="/home/${USER}/deepcluster/trained_models/"
 RESUME="/home/${USER}/deepcluster/trained_models/deepcluster_norb_checkpoint.pth.tar"
 
@@ -42,4 +42,4 @@ RESUME="/home/${USER}/deepcluster/trained_models/deepcluster_norb_checkpoint.pth
 mkdir -p ${EXP}
 
 python main.py --dataset ${DATASET} --datadir ${DIR} --exp ${EXP} --arch ${ARCH} --resume ${RESUME} \
-  --lr ${LR} --wd ${WD} --k ${K} --verbose --workers ${WORKERS}
+  --lr ${LR} --wd ${WD} --k ${K} --verbose --workers ${WORKERS} --checkpoints 10000

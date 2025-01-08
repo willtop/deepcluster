@@ -221,7 +221,7 @@ def main(args):
                     'arch': args.arch,
                     'state_dict': model.state_dict(),
                     'optimizer' : optimizer.state_dict()},
-                   os.path.join(args.exp, f'{args.dataset}_checkpoint.pth.tar'))
+                   os.path.join(args.exp, f'deepcluster_{args.dataset}_checkpoint.pth.tar'))
 
         # save cluster assignments
         cluster_log.log(deepcluster.images_lists)
@@ -295,7 +295,7 @@ def train(loader, model, crit, opt, epoch):
         batch_time.update(time.time() - end)
         end = time.time()
 
-        if args.verbose and (i % 200) == 0:
+        if args.verbose and (i % 10) == 0:
             print('Epoch: [{0}][{1}/{2}]\t'
                   'Time: {batch_time.val:.3f} ({batch_time.avg:.3f})\t'
                   'Data: {data_time.val:.3f} ({data_time.avg:.3f})\t'
