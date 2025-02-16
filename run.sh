@@ -10,10 +10,11 @@
 DATASET="celeba"
 DIR="/home/${USER}/deepcluster/datasets/celeba/train"
 ARCH="alexnet"
-LR=0.005
+LR=0.05
 WD=-5
-K=1000
+K=10000
 WORKERS=12
+SOBEL=false
 EXP="/home/${USER}/deepcluster/trained_models/"
 RESUME="/home/${USER}/deepcluster/trained_models/deepcluster_celeba_checkpoint.pth.tar"
 
@@ -25,6 +26,7 @@ RESUME="/home/${USER}/deepcluster/trained_models/deepcluster_celeba_checkpoint.p
 # WD=-5
 # K=1000
 # WORKERS=0 # for some reason, with WORKERS being non zero, threading got block when loading batches from dataloader
+# SOBEL=false
 # EXP="/home/${USER}/deepcluster/trained_models/"
 # RESUME="/home/${USER}/deepcluster/trained_models/deepcluster_norb_checkpoint.pth.tar"
 
@@ -36,6 +38,7 @@ RESUME="/home/${USER}/deepcluster/trained_models/deepcluster_celeba_checkpoint.p
 # WD=-5
 # K=1000
 # WORKERS=0 # for some reason, with WORKERS being non zero, threading got block when loading batches from dataloader
+# SOBEL=false
 # EXP="/home/${USER}/deepcluster/trained_models/"
 # RESUME="/home/${USER}/deepcluster/trained_models/deepcluster_causal3d_checkpoint.pth.tar"
 
@@ -47,10 +50,11 @@ RESUME="/home/${USER}/deepcluster/trained_models/deepcluster_celeba_checkpoint.p
 # WD=-5
 # K=1000
 # WORKERS=12
+# SOBEL=false
 # EXP="/home/${USER}/deepcluster/trained_models/"
 # RESUME="/home/${USER}/deepcluster/trained_models/deepcluster_mpi3d_checkpoint.pth.tar"
 
 mkdir -p ${EXP}
 
 python main.py --dataset ${DATASET} --datadir ${DIR} --exp ${EXP} --arch ${ARCH} --resume ${RESUME} \
-  --lr ${LR} --wd ${WD} --k ${K} --verbose --workers ${WORKERS} --checkpoints 10000
+  --lr ${LR} --wd ${WD} --k ${K} --sobel ${SOBEL} --verbose --workers ${WORKERS} --checkpoints 10000
