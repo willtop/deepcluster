@@ -19,6 +19,7 @@ import torch.backends.cudnn as cudnn
 import torch.optim
 import torch.utils.data
 import torchvision.transforms as transforms
+import torchvision.transforms.functional as F
 import torchvision.datasets as torchvisiondatasets
 from tqdm import tqdm
 
@@ -26,11 +27,17 @@ import clustering
 import models
 from util import AverageMeter, Logger, UnifLabelSampler
 
+# more strict than the cropping did in original DiTi paper. 
+# Aggressive but focus on face and eliminates background noise
+class CropCelebA(object):
+    def __call__(self, img):
+        new_img = F.crop(img, 57, 35, 128, 100)
+        return new_img
 
 def parse_args():
     parser = argparse.ArgumentParser(description='PyTorch Implementation of DeepCluster')
 
-    parser.add_argument("--dataset", choices=['celeba', 'mpi3d', 'norb'])
+    parser.add_argument("--dataset", choices=['celeba', 'mpi3d', 'norb', "causal3d"])
     parser.add_argument('--datadir', metavar='DIR', help='path to dataset')
     parser.add_argument('--arch', '-a', type=str, metavar='ARCH',
                         choices=['alexnet', 'vgg16'], default='alexnet',
@@ -123,8 +130,8 @@ def main(args):
         normalize = transforms.Normalize(mean=[0.485, 0.456, 0.406],
                                         std=[0.229, 0.224, 0.225])
         data_transforms = transforms.Compose([
-            transforms.Resize(256),
-            transforms.CenterCrop(224),
+            CropCelebA(),
+            transforms.Resize((224, 224)),
             transforms.ToTensor(),
             normalize])
     elif args.dataset == "mpi3d":
@@ -135,6 +142,8 @@ def main(args):
         data_transforms = transforms.Compose([
             transforms.ToTensor(),
             transforms.Resize((224, 224))])
+    elif args.dataset == "causal3d":
+        data_transforms = transforms.ToTensor()
     else:
         print("Unimplemented dataset: ", args.dataset)
         exit(1)

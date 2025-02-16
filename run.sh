@@ -7,26 +7,37 @@
 #!/bin/bash
 
 # CelebA
-# DATASET="celeba"
-# DIR="/home/${USER}/deepcluster/datasets/celeba/img_align_celeba/train"
-# ARCH="alexnet"
-# LR=0.005
-# WD=-5
-# K=1000
-# WORKERS=12
-# EXP="/home/${USER}/deepcluster/trained_models/"
-# RESUME="/home/${USER}/deepcluster/trained_models/deepcluster_celeba_checkpoint.pth.tar"
-
-# NORB
-DATASET="norb"
-DIR="/home/${USER}/deepcluster/datasets/norb/train"
+DATASET="celeba"
+DIR="/home/${USER}/deepcluster/datasets/celeba/train"
 ARCH="alexnet"
 LR=0.005
 WD=-5
 K=1000
-WORKERS=0 # for some reason, with WORKERS being non zero, threading got block when loading batches from dataloader
+WORKERS=12
 EXP="/home/${USER}/deepcluster/trained_models/"
-RESUME="/home/${USER}/deepcluster/trained_models/deepcluster_norb_checkpoint.pth.tar"
+RESUME="/home/${USER}/deepcluster/trained_models/deepcluster_celeba_checkpoint.pth.tar"
+
+# NORB
+# DATASET="norb"
+# DIR="/home/${USER}/deepcluster/datasets/norb/train"
+# ARCH="alexnet"
+# LR=0.005
+# WD=-5
+# K=1000
+# WORKERS=0 # for some reason, with WORKERS being non zero, threading got block when loading batches from dataloader
+# EXP="/home/${USER}/deepcluster/trained_models/"
+# RESUME="/home/${USER}/deepcluster/trained_models/deepcluster_norb_checkpoint.pth.tar"
+
+# Causal3D
+# DATASET="causal3d"
+# DIR="/home/${USER}/deepcluster/datasets/causal3d"
+# ARCH="alexnet"
+# LR=0.005
+# WD=-5
+# K=1000
+# WORKERS=0 # for some reason, with WORKERS being non zero, threading got block when loading batches from dataloader
+# EXP="/home/${USER}/deepcluster/trained_models/"
+# RESUME="/home/${USER}/deepcluster/trained_models/deepcluster_causal3d_checkpoint.pth.tar"
 
 # MPI3D
 # DATASET="mpi3d"
